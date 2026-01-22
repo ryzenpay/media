@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: media-ingress
+  namespace: media
+spec:
+  ingressClassName: treafik
+  rules:
+  - host: media.ryzen.me
+    http:
+      paths:
+      - path: /sonarr
+        pathType: Prefix
+        backend:
+          service:
+            name: media-service
+            port:
+              number: 8989
+      - path: /lidarr
+        pathType: Prefix
+        backend:
+          service:
+            name: media-service
+            port:
+              number: 8686
+      - path: /radarr
+        pathType: Prefix
+        backend:
+          service:
+            name: media-service
+            port:
+              number: 7878
+      - path: /readarr
+        pathType: Prefix
+        backend:
+          service:
+            name: media-service
+            port:
+              number: 8787
