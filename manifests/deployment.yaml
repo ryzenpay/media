@@ -66,8 +66,10 @@
           - name: TZ
             value: "Etc/UTC"
           volumeMounts:
-          - name: sonarr-data
+          - name: sonarr-config
             mountPath: /config
+          - name: sonarr-data
+            mountPath: /data
         - name: lidarr
           image: lscr.io/linuxserver/lidarr:latest
           env:
@@ -79,6 +81,8 @@
             value: "Etc/UTC"
           volumeMounts:
           - name: lidarr-data
+            mountPath: /data
+          - name: lidarr-config
             mountPath: /config
         - name: radarr
           image: lscr.io/linuxserver/radarr:latest
@@ -91,6 +95,8 @@
             value: "Etc/UTC"
           volumeMounts:
           - name: radarr-data
+            mountPath: /data
+          - name: sonarr-config
             mountPath: /config
         volumes:
         - name: sonarr-data
@@ -102,3 +108,12 @@
         - name: radarr-data
           persistentVolumeClaim:
             claimName: radarr-pvc
+        - name: sonarr-config
+          persistentVolumeClaim:
+            claimName: sonarr-config
+        - name: lidarr-config
+          persistentVolumeClaim:
+            claimName: lidarr-config
+        - name: radarr-config
+          persistentVolumeClaim:
+            claimName: radarr-config
