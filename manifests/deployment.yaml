@@ -28,7 +28,7 @@
             - name: VPN_TYPE
               value: "wireguard"
             - name: FIREWALL_VPN_INPUT_PORTS
-              value: "8989,8686,7878,8787"
+              value: "8989,8686,7878"
             - name: WIREGUARD_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
@@ -91,20 +91,6 @@
           volumeMounts:
           - name: radarr-data
             mountPath: /config
-        - name: readarr
-          image: lscr.io/linuxserver/readarr:develop
-          env:
-          - name: PUID
-            value: "1000"
-          - name: PGID
-            value: "1000"
-          - name: TZ
-            value: "Etc/UTC"
-          ports:
-          - containerPort: 8787
-          volumeMounts:
-          - name: readarr-data
-            mountPath: /config
         volumes:
         - name: sonarr-data
           persistentVolumeClaim:
@@ -115,6 +101,3 @@
         - name: radarr-data
           persistentVolumeClaim:
             claimName: radarr-pvc
-        - name: readarr-data
-          persistentVolumeClaim:
-            claimName: readarr-pvc

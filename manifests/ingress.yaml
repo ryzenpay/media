@@ -30,10 +30,3 @@ spec:
             name: media-service
             port:
               number: 7878
-      - path: /readarr
-        pathType: Prefix
-        backend:
-          service:
-            name: media-service
-            port:
-              number: 8787
