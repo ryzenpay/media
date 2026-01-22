@@ -1,114 +1,112 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: media
-  namespace: media
-  labels:
-    app: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: media
+    namespace: media
+    labels:
       app: media
-  template:
-    metadata:
-      labels:
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
         app: media
-    spec:
-      containers:
-      - name: ensure-ip
-        image: curlimages/curl
-        command: ["/bin/sh", "-c"]
-        args: ["while true; do sleep 10; curl icanhazip.com; done"]
-      - name: wireguard
-        image: lscr.io/linuxserver/wireguard:latest
-        securityContext:
-          capabilities:
-            add:
-              - NET_ADMIN
-        env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: TZ
-          value: "America/New_York"
-        volumeMounts:
-        - name: wg-config
-          mountPath: /config/wg0.conf
-          subPath: wg0.conf
-        livenessProbe:
-          exec:
-            command: 
-            - /bin/sh
-            - -c
-            - |
-              wg show wg0 latest-handshakes | awk '{if ($3 > 30) exit 1}' && ping -c 1 8.8.8.8 || exit 1
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 3
-          initialDelaySeconds: 20 
-      - name: sonarr
-        image: ghcr.io/linuxserver/sonarr:latest
-        env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: TZ
-          value: "Etc/UTC"
-        volumeMounts:
+    template:
+      metadata:
+        labels:
+          app: media
+      spec:
+        containers:
+        - name: wireguard
+          image: qmcgaw/gluetun:latest
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          env:
+            - name: VPN_SERVICE_PROVIDER
+              value: "mullvad"
+            - name: VPN_TYPE
+              value: "wireguard"
+            - name: FIREWALL_VPN_INPUT_PORTS
+              value: "8989,8686,7878,8787"
+            - name: WIREGUARD_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wireguard-secret
+                  key: WIREGUARD_PRIVATE_KEY
+            - name: WIREGUARD_ADDRESSES
+              valueFrom:
+                secretKeyRef:
+                  name: wireguard-secret
+                  key: WIREGUARD_ADDRESSES
+            - name: SERVER_CITIES
+              value: "Toronto"
+          livenessProbe:
+            exec:
+              command:
+              - /gluetun-entrypoint
+              - healthcheck
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 5
+        - name: sonarr
+          image: ghcr.io/linuxserver/sonarr:latest
+          env:
+          - name: PUID
+            value: "1000"
+          - name: PGID
+            value: "1000"
+          - name: TZ
+            value: "Etc/UTC"
+          volumeMounts:
+          - name: sonarr-data
+            mountPath: /config
+        - name: lidarr
+          image: lscr.io/linuxserver/lidarr:latest
+          env:
+          - name: PUID
+            value: "1000"
+          - name: PGID
+            value: "1000"
+          - name: TZ
+            value: "Etc/UTC"
+          volumeMounts:
+          - name: lidarr-data
+            mountPath: /config
+        - name: radarr
+          image: lscr.io/linuxserver/radarr:latest
+          env:
+          - name: PUID
+            value: "1000"
+          - name: PGID
+            value: "1000"
+          - name: TZ
+            value: "Etc/UTC"
+          volumeMounts:
+          - name: radarr-data
+            mountPath: /config
+        - name: readarr
+          image: lscr.io/linuxserver/readarr:develop
+          env:
+          - name: PUID
+            value: "1000"
+          - name: PGID
+            value: "1000"
+          - name: TZ
+            value: "Etc/UTC"
+          volumeMounts:
+          - name: readarr-data
+            mountPath: /config
+        volumes:
         - name: sonarr-data
-          mountPath: /config
-      - name: lidarr
-        image: lscr.io/linuxserver/lidarr:latest
-        env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: TZ
-          value: "Etc/UTC"
-        volumeMounts:
+          persistentVolumeClaim:
+            claimName: sonarr-pvc
         - name: lidarr-data
-          mountPath: /config
-      - name: radarr
-        image: lscr.io/linuxserver/radarr:latest
-        env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: TZ
-          value: "Etc/UTC"
-        volumeMounts:
+          persistentVolumeClaim:
+            claimName: lidarr-pvc
         - name: radarr-data
-          mountPath: /config
-      - name: readarr
-        image: lscr.io/linuxserver/readarr:develop
-        env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
-        - name: TZ
-          value: "Etc/UTC"
-        volumeMounts:
+          persistentVolumeClaim:
+            claimName: radarr-pvc
         - name: readarr-data
-          mountPath: /config
-      volumes:
-      - name: wg-config
-        secret:
-          secretName: wireguard-secret
-      - name: sonarr-data
-        persistentVolumeClaim:
-          claimName: sonarr-pvc
-      - name: lidarr-data
-        persistentVolumeClaim:
-          claimName: lidarr-pvc
-      - name: radarr-data
-        persistentVolumeClaim:
-          claimName: radarr-pvc
-      - name: readarr-data
-        persistentVolumeClaim:
-          claimName: readarr-pvc
+          persistentVolumeClaim:
+            claimName: readarr-pvc
