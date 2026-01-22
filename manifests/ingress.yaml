@@ -16,17 +16,21 @@ spec:
             name: media-service
             port:
               number: 8989
+  - host: lidarr.media.ryzen.me
+    http:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: lidarr.media-service
+            name: media-service
             port:
               number: 8686
+  - host: radarr.media.ryzen.me
+    http:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: radarr.media-service
+            name: media-service
             port:
               number: 7878
