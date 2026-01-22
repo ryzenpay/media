@@ -1,20 +1,26 @@
 services:
-  wireguard:
-    image: lscr.io/linuxserver/wireguard:latest
-    container_name: wireguard
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
     cap_add:
       - NET_ADMIN
+    env_file: .env
     environment:
-      - PUID=1000
-      - PGID=1000
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      - SERVER_CITIES=Toronto
       - TZ=America/New_York
     volumes:
-      - ./wireguard:/config
+      - ./config/gluetun:/gluetun
     ports:
       - 8989:8989
       - 8686:8686
       - 7878:7878
       - 8787:8787
+      - 9696:9696
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     healthcheck:
@@ -32,10 +38,12 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ./data/sonarr:/config
+      - ./config/sonarr:/config
+      - ./data/sonarr:/data
+      - ./data/qbittorrent:/downloads
     # ports:
     #   - 8989:8989
-    network_mode: service:wireguard
+    network_mode: service:gluetun
     restart: unless-stopped
   lidarr:
     image: lscr.io/linuxserver/lidarr:latest
@@ -45,10 +53,12 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ./data/lidarr:/config
+      - ./config/lidarr:/config
+      - ./data/lidarr:/data
+      - ./data/qbittorrent:/downloads
     # ports:
     #   - 8686:8686
-    network_mode: service:wireguard
+    network_mode: service:gluetun
     restart: unless-stopped
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -58,21 +68,41 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ./data/radarr:/config
+      - ./config/radarr:/config
+      - ./data/radarr:/data
+      - ./data/qbittorrent:/downloads
     # ports:
     #   - 7878:7878
-    network_mode: service:wireguard
+    network_mode: service:gluetun
     restart: unless-stopped
-  # readarr:
-  #   image: lscr.io/linuxserver/readarr:develop
-  #   container_name: readarr
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=Etc/UTC
-  #   volumes:
-  #     - ./readarr:/config
-  #   ports:
-  #     - 8787:8787
-  #   network_mode: service:wireguard
-  #   restart: unless-stopped
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./config/prowlarr:/config
+    # ports:
+    #   - 9696:9696
+    network_mode: service:gluetun
+    restart: unless-stopped
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - ./config/qbittorrent:/config
+      - ./data/qbittorrent:/downloads
+    # ports:
+    #   - 8080:8080
+      # - 6881:6881
+      # - 6881:6881/udp
+    network_mode: service:gluetun
+    restart: unless-stopped
