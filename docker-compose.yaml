@@ -1,0 +1,78 @@
+services:
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./wireguard:/config
+    ports:
+      - 8989:8989
+      - 8686:8686
+      - 7878:7878
+      - 8787:8787
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    healthcheck:
+      test: ["CMD-SHELL", "wg show wg0 latest-handshakes | awk '{if ($3 > 30) exit 1}' && ping -c 1 8.8.8.8 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./data/sonarr:/config
+    # ports:
+    #   - 8989:8989
+    network_mode: service:wireguard
+    restart: unless-stopped
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./data/lidarr:/config
+    # ports:
+    #   - 8686:8686
+    network_mode: service:wireguard
+    restart: unless-stopped
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./data/radarr:/config
+    # ports:
+    #   - 7878:7878
+    network_mode: service:wireguard
+    restart: unless-stopped
+  # readarr:
+  #   image: lscr.io/linuxserver/readarr:develop
+  #   container_name: readarr
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=Etc/UTC
+  #   volumes:
+  #     - ./readarr:/config
+  #   ports:
+  #     - 8787:8787
+  #   network_mode: service:wireguard
+  #   restart: unless-stopped
