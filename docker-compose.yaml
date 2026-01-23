@@ -8,9 +8,11 @@ services:
     environment:
       - VPN_SERVICE_PROVIDER=mullvad
       - VPN_TYPE=wireguard
-      # - SERVER_CITIES=Toronto
+      # - SERVER_CITIES=Toronto\
+      - DNS_ADDRESS=1.1.1.1
       - TZ=America/New_York
-      - FIREWALL_VPN_INPUT_PORTS=8080
+      - FIREWALL_VPN_INPUT_PORTS=6881
+      - FIREWALL_INPUT_PORTS=8080
     volumes:
       - ./config/gluetun:/gluetun
     ports:
