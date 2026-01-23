@@ -10,9 +10,11 @@ services:
       - VPN_TYPE=wireguard
       # - SERVER_CITIES=Toronto
       - TZ=America/New_York
+      - FIREWALL_VPN_INPUT_PORTS=8080
     volumes:
       - ./config/gluetun:/gluetun
     ports:
+      - 8080:8080
       - 6881:6881
       - 6881:6881/udp
     sysctls:
@@ -89,8 +91,8 @@ services:
     volumes:
       - ./config/qbittorrent:/config
       - ./data/qbittorrent:/downloads
-    ports:
-      - 8080:8080
+    # ports:
+    #   - 8080:8080
       # - 6881:6881
       # - 6881:6881/udp
     network_mode: service:gluetun
