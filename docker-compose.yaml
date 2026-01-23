@@ -8,12 +8,11 @@ services:
     environment:
       - VPN_SERVICE_PROVIDER=mullvad
       - VPN_TYPE=wireguard
-      - SERVER_CITIES=Toronto
+      # - SERVER_CITIES=Toronto
       - TZ=America/New_York
     volumes:
       - ./config/gluetun:/gluetun
     ports:
-      - 8080:8080
       - 6881:6881
       - 6881:6881/udp
     sysctls:
@@ -90,8 +89,8 @@ services:
     volumes:
       - ./config/qbittorrent:/config
       - ./data/qbittorrent:/downloads
-    # ports:
-    #   - 8080:8080
+    ports:
+      - 8080:8080
       # - 6881:6881
       # - 6881:6881/udp
     network_mode: service:gluetun

@@ -1,7 +1,7 @@
   apiVersion: apps/v1
   kind: Deployment
   metadata:
-    name: media
+    name: media-arr
     namespace: media
     labels:
       app: media
@@ -15,49 +15,11 @@
         labels:
           app: media
       spec:
-        initContainers:
-        - name: wireguard
-          image: qmcgaw/gluetun:latest
-          securityContext:
-            capabilities:
-              add:
-                - NET_ADMIN
-          ports:
-          - containerPort: 8989
-          - containerPort: 8686
-          - containerPort: 7878
-          restartPolicy: Always
-          env:
-            - name: VPN_SERVICE_PROVIDER
-              value: "mullvad"
-            - name: VPN_TYPE
-              value: "wireguard"
-            - name: FIREWALL_INPUT_PORTS
-              value: "8989,8686,7878"
-            - name: WIREGUARD_PRIVATE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: wireguard-secret
-                  key: WIREGUARD_PRIVATE_KEY
-            - name: WIREGUARD_ADDRESSES
-              valueFrom:
-                secretKeyRef:
-                  name: wireguard-secret
-                  key: WIREGUARD_ADDRESSES
-            - name: SERVER_CITIES
-              value: "Toronto"
-          livenessProbe:
-            exec:
-              command:
-              - /gluetun-entrypoint
-              - healthcheck
-            initialDelaySeconds: 10
-            periodSeconds: 20
-            timeoutSeconds: 5
-          
         containers:
         - name: sonarr
           image: ghcr.io/linuxserver/sonarr:latest
+          ports:
+          - containerPort: 8989
           env:
           - name: PUID
             value: "1000"
@@ -72,6 +34,8 @@
             mountPath: /data
         - name: lidarr
           image: lscr.io/linuxserver/lidarr:latest
+          ports:
+          - containerPort: 8686
           env:
           - name: PUID
             value: "1000"
@@ -86,6 +50,8 @@
             mountPath: /config
         - name: radarr
           image: lscr.io/linuxserver/radarr:latest
+          ports:
+          - containerPort: 7878
           env:
           - name: PUID
             value: "1000"
@@ -97,6 +63,20 @@
           - name: radarr-data
             mountPath: /data
           - name: sonarr-config
+            mountPath: /config
+        - name: prowlarr
+          image: lscr.io/linuxserver/prowlarr:latest
+          ports:
+          - containerPort: 9696
+          env:
+          - name: PUID
+            value: "1000"
+          - name: PGID
+            value: "1000"
+          - name: TZ
+            value: "Etc/UTC"
+          volumeMounts:
+          - name: prowlarr-config
             mountPath: /config
         volumes:
         - name: sonarr-data
@@ -117,3 +97,6 @@
         - name: radarr-config
           persistentVolumeClaim:
             claimName: radarr-config
+        - name: prowlarr-config
+          persistentVolumeClaim:
+            claimName: prowlarr-config
