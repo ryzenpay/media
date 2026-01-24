@@ -30,7 +30,7 @@
           volumeMounts:
           - name: sonarr-config
             mountPath: /config
-          - name: sonarr-data
+          - name: content
             mountPath: /tv
           - name: qbittorrent-data
             mountPath: /downloads
@@ -46,7 +46,7 @@
           - name: TZ
             value: "Etc/UTC"
           volumeMounts:
-          - name: lidarr-data
+          - name: content
             mountPath: /music
           - name: lidarr-config
             mountPath: /config
