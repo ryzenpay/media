@@ -1,0 +1,23 @@
+apiVersion: fleet.cattle.io/v1alpha1
+kind: HelmOp
+metadata:
+  name: jellyseer
+  namespace: fleet-local
+spec:
+  helm:
+    pollingInterval: 1m
+    chart: oci://ghcr.io/fallenbagel/jellyseerr/jellyseerr-chart
+    version: 2.7.0
+    values:
+      ingress:
+        enabled: true
+        hosts:
+          - host: seer.media.ryzen.me
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - secretName: seer-tls
+            hosts:
+              - seer.media.ryzen.me
+  defaultNamespace: monitoring
