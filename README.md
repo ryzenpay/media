@@ -25,3 +25,6 @@ if using mullvad, use the custom port for torrenting (provided in web gui when g
 ### Docker
 *arr -> qbitorrent = gluetun:8080
 *arr -> *arr = localhost:<port>
+
+## Kubernetes
+for some reason, when fleet controlling media-qbit, it just stops workign :shrug:
