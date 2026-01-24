@@ -19,3 +19,6 @@ spec:
     - name: prowlarr
       port: 9696
       targetPort: 9696
+    - name: bazarr
+      port: 6767
+      targetPort: 6767

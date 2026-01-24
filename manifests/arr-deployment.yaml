@@ -89,6 +89,26 @@
           volumeMounts:
           - name: prowlarr-config
             mountPath: /config
+        - name: prowlarr
+          image: lscr.io/linuxserver/prowlarr:latest
+          ports:
+          - containerPort: 6767
+          env:
+          - name: PUID
+            value: "1000"
+          - name: PGID
+            value: "1000"
+          - name: TZ
+            value: "Etc/UTC"
+          volumeMounts:
+          - name: bazarr-config
+            mountPath: /config
+          - name: content
+            mountPath: /movies
+            subPath: movies
+          - name: content
+            mountPath: /tv
+            subPath: tv
         volumes:
         - name: content
           persistentVolumeClaim:
@@ -108,3 +128,6 @@
         - name: prowlarr-config
           persistentVolumeClaim:
             claimName: prowlarr-config
+        - name: bazarr-config
+          persistentVolumeClaim:
+            claimName: bazarr-config

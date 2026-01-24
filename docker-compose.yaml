@@ -79,6 +79,20 @@ services:
     ports:
       - 9696:9696
     restart: unless-stopped
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./config/bazarr:/config
+      - ./data/sonarr:/tv
+      - ./data/radarr:/movies
+    ports:
+      - 6767:6767
+    restart: unless-stopped
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
