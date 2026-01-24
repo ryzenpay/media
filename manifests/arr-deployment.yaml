@@ -4,16 +4,16 @@
     name: media-arr
     namespace: media
     labels:
-      app: arr-media
+      app: media-arr
   spec:
     replicas: 1
     selector:
       matchLabels:
-        app: arr-media
+        app: media-arr
     template:
       metadata:
         labels:
-          app: arr-media
+          app: media-arr
       spec:
         containers:
         - name: sonarr

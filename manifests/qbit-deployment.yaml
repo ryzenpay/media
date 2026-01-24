@@ -4,16 +4,16 @@
     name: media-qbit
     namespace: media
     labels:
-      app: qbit-media
+      app: media-qbit
   spec:
     replicas: 1
     selector:
       matchLabels:
-        app: qbit-media
+        app: media-qbit
     template:
       metadata:
         labels:
-          app: qbit-media
+          app: media-qbit
       spec:
         initContainers:
         - name: wireguard
