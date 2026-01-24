@@ -34,6 +34,7 @@
             mountPath: /config
           - name: content
             mountPath: /tv
+            subPath: tv
           - name: qbittorrent-data
             mountPath: /downloads
         - name: lidarr
@@ -50,6 +51,7 @@
           volumeMounts:
           - name: content
             mountPath: /music
+            subPath: music
           - name: lidarr-config
             mountPath: /config
           - name: qbittorrent-data
@@ -68,6 +70,7 @@
           volumeMounts:
           - name: content
             mountPath: /movies
+            subPath: movies
           - name: radarr-config
             mountPath: /config
           - name: qbittorrent-data
