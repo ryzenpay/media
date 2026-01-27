@@ -6,11 +6,27 @@ metadata:
   labels:
     app: content-pvc
 spec:
+  storageClassName: media-storage
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 100Gi
+      storage: 1Ti
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qbittorrent-pvc
+  namespace: media
+  labels:
+    app: qbittorrent-pvc
+spec:
+  storageClassName: media-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Ti
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -67,20 +83,6 @@ spec:
   resources:
     requests:
       storage: 1Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: qbittorrent-pvc
-  namespace: media
-  labels:
-    app: qbittorrent-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 100Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
