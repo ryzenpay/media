@@ -44,6 +44,14 @@
                   key: WIREGUARD_ADDRESSES
             # - name: SERVER_CITIES
             #   value: "Toronto"
+          startupProbe:
+            exec:
+              command:
+              - /gluetun-entrypoint
+              - healthcheck
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            failureThreshold: 10
           livenessProbe:
             exec:
               command:
