@@ -20,3 +20,5 @@ spec:
         existingClaim: content-pvc
       cache:
         enabled: true
+      config:
+        storageClass: retain
