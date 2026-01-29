@@ -10,11 +10,17 @@ spec:
   valuesContent: |-
     ingress:
       enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: cert-issuer
       hosts:
         - host: media.ryzen.me
           paths:
             - path: /
               pathType: Prefix
+      tls:
+        - secretName: jellyfin-tls
+          hosts:
+            - media.ryzen.me
     persistence:
       media:
         existingClaim: content-pvc
