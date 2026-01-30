@@ -8,5 +8,5 @@ spec:
     app: qbit
   ports:
     - name: qbittorrent
-      port: {{ .Values.qbittorrent.service.port }}
-      targetPort: {{ .Values.qbittorrent.service.port }}
+      port: {{ .Values.qbittorrent.config.web_port }}
+      targetPort: {{ .Values.qbittorrent.config.web_port }}

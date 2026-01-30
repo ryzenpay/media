@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-qbit
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: qbit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qbit
+  template:
+    metadata:
+      labels:
+        app: qbit
+    spec:
+    {{ if .Values.qbittorrent.vpn.enabled }}
+      initContainers:
+      - name: wireguard
+        image: qmcgaw/gluetun:latest
+        securityContext:
+          capabilities:
+            add:
+              - NET_ADMIN
+        restartPolicy: Always
+        env:
+          - name: VPN_SERVICE_PROVIDER
+            value: {{ .Values.qbittorrent.vpn.config.service_provider }}
+          - name: VPN_TYPE
+            value: {{ .Values.qbittorrent.vpn.config.type }}
+          - name: DNS_ADDRESS
+            value: {{ .Values.qbittorrent.vpn.config.dns }}
+          - name: FIREWALL_INPUT_PORTS
+            value: {{ .Values.qbittorrent.config.web_port | quote }}
+          - name: WIREGUARD_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.qbittorrent.vpn.secret.name }}
+                key: {{ .Values.qbittorrent.vpn.secret.privateKeySecretKey }}
+          - name: WIREGUARD_ADDRESSES
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.qbittorrent.vpn.secret.name }}
+                key: {{ .Values.qbittorrent.vpn.secret.addressesSecretKey }}
+        {{-  if (.Values.qbittorrent.vpn.config.city | empty) }}
+          - name: SERVER_CITIES
+            value: {{ .Values.qbittorrent.vpn.config.cities }}
+        {{-  end }}
+        startupProbe:
+          exec:
+            command:
+            - /gluetun-entrypoint
+            - healthcheck
+          periodSeconds: 5
+          failureThreshold: 10
+        livenessProbe:
+          exec:
+            command:
+            - /gluetun-entrypoint
+            - healthcheck
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
+    {{ end }}
+      containers:
+      - name: qbittorrent
+        image: lscr.io/linuxserver/qbittorrent:latest
+        ports:
+          - containerPort: {{ .Values.qbittorrent.config.web_port }}
+          - containerPort: {{ .Values.qbittorrent.config.torrenting_port }}
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: {{ .Values.timezone | quote }}
+        - name: WEBUI_PORT
+          value: {{ .Values.qbittorrent.config.web_port | quote }}
+        - name: TORRENTING_PORT
+          value: {{ .Values.qbittorrent.config.torrenting_port | quote }}
+        volumeMounts:
+        - name: qbit-config
+          mountPath: /config
+      {{- if .Values.qbittorrent.persistent.enabled }}
+        - name: qbit-data
+          mountPath: /downloads
+      {{- end }}
+        # startupProbe: #TODO: needs auth
+        #   exec:
+        #     command:
+        #       - /bin/sh
+        #       - -c
+        #       - curl -sf http://localhost:8080/api/v2/transfer/info | grep -q '"connection_status":"connected"'
+        #   failureThreshold: 30
+        #   periodSeconds: 10
+        # livenessProbe:
+        #   exec:
+        #     command:
+        #       - /bin/sh
+        #       - -c
+        #       - curl -sf http://localhost:8080/api/v2/transfer/info | grep -q '"connection_status":"connected"'
+        #   periodSeconds: 15
+        #   failureThreshold: 3
+      volumes:
+      - name: qbit-config
+        persistentVolumeClaim:
+          claimName: qbit-config
+      {{- if .Values.qbittorrent.persistent.enabled }}
+      - name: {{ .Values.qbittorrent.persistent.name }}
+        persistentVolumeClaim:
+          claimName: qbit-data
+      {{- end }}

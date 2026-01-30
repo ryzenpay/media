@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-arr
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: arr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arr
+  template:
+    metadata:
+      labels:
+        app: arr
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: sonarr
+        image: ghcr.io/linuxserver/sonarr:latest
+        ports:
+        - containerPort: 8989
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: {{ .Values.timezone }}
+        volumeMounts:
+        - name: sonarr-config
+          mountPath: /config
+        - name: arr-data
+          mountPath: /tv
+          subPath: tv
+        {{- if .Values.qbittorrent.persistent.enabled }}
+        - name: qbit-data
+          mountPath: /downloads
+        {{- end }}
+      - name: lidarr
+        image: lscr.io/linuxserver/lidarr:latest
+        ports:
+        - containerPort: 8686
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: {{ .Values.timezone }}
+        volumeMounts:
+        - name: arr-data
+          mountPath: /music
+          subPath: music
+        - name: lidarr-config
+          mountPath: /config
+        {{- if .Values.qbittorrent.persistent.enabled }}
+        - name: qbit-data
+          mountPath: /downloads
+        {{- end }}
+      - name: radarr
+        image: lscr.io/linuxserver/radarr:latest
+        ports:
+        - containerPort: 7878
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: {{ .Values.timezone }}
+        volumeMounts:
+        - name: arr-data
+          mountPath: /movies
+          subPath: movies
+        - name: radarr-config
+          mountPath: /config
+        {{- if .Values.qbittorrent.persistent.enabled }}
+        - name: qbit-data
+          mountPath: /downloads
+        {{- end }}
+      - name: prowlarr
+        image: lscr.io/linuxserver/prowlarr:latest
+        ports:
+        - containerPort: 9696
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: {{ .Values.timezone }}
+        volumeMounts:
+        - name: prowlarr-config
+          mountPath: /config
+      - name: bazarr
+        image: lscr.io/linuxserver/bazarr:latest
+        ports:
+        - containerPort: 6767
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: {{ .Values.timezone }}
+        volumeMounts:
+        - name: bazarr-config
+          mountPath: /config
+        - name: arr-data
+          mountPath: /movies
+          subPath: movies
+        - name: {{ .Values.arr.persistent.name }}
+          mountPath: /tv
+          subPath: tv
+      volumes:
+      - name: {{ .Values.arr.persistent.name }}
+        persistentVolumeClaim:
+          claimName: arr-data
+      {{- if .Values.qbittorrent.persistent.enabled }}
+      - name: {{ .Values.qbittorrent.persistent.name }}
+        persistentVolumeClaim:
+          claimName: qbit-data
+      {{- end }}
+      - name: sonarr-config
+        persistentVolumeClaim:
+          claimName: sonarr-config
+      - name: lidarr-config
+        persistentVolumeClaim:
+          claimName: lidarr-config
+      - name: radarr-config
+        persistentVolumeClaim:
+          claimName: radarr-config
+      - name: prowlarr-config
+        persistentVolumeClaim:
+          claimName: prowlarr-config
+      - name: bazarr-config
+        persistentVolumeClaim:
+          claimName: bazarr-config
