@@ -43,8 +43,7 @@ if using mullvad, use the custom port for torrenting (provided in web gui when g
 *arr -> *arr = localhost:<port>  
 
 ## Kubernetes
-for some reason, when fleet controlling media-qbit, it just stops workign :shrug:  
 
 # TODO
--[ ] helm chart
+-[x] helm chart
 -[ ] qbittorrent liveness check
