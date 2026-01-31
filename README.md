@@ -45,5 +45,7 @@ if using mullvad, use the custom port for torrenting (provided in web gui when g
 ## Kubernetes
 
 # TODO
--[x] helm chart
--[ ] qbittorrent liveness check
+-[x] helm chart  
+-[ ] qbittorrent liveness check  
+-[ ] configarr (https://configarr.de)
+-[ ] scraparr (https://github.com/imgios/scraparr)
