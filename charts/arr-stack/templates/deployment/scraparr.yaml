@@ -52,11 +52,4 @@ spec:
             secretKeyRef:
               name: arr-secret
               key: PROWLARR_API
-        - name: BAZARR_URL
-          value: http://arr:6767
-        - name: BAZARR_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: arr-secret
-              key: BAZARR_API
 {{ end }}
