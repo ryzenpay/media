@@ -23,7 +23,7 @@ spec:
             - media.ryzen.me
     persistence:
       media:
-        existingClaim: content-pvc
+        existingClaim: arr-data
       cache:
         enabled: true
       config:

@@ -17,7 +17,8 @@ spec:
           storageClass: media
         vpn:
           secret:
-            existing: false
+            existing: true
+            name: arr-config-secret
             privateKeySecretKey: WIREGUARD_PRIVATE_KEY
             addressesSecretKey: WIREGUARD_ADDRESSES
       arr:
@@ -35,5 +36,6 @@ spec:
       discord:
         enabled: true
         secret:
-          existing: false
+          existing: true
+          name: arr-config-secret
   defaultNamespace: media
