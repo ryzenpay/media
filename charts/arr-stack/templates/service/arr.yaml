@@ -22,3 +22,6 @@ spec:
     - name: bazarr
       port: 6767
       targetPort: 6767
+    - name: readarr
+      port: 8787
+      targetPort: 8787

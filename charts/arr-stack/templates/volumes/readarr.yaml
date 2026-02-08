@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: readarr-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: readarr-config
+spec:
+  storageClassName: {{ .Values.arr.config.storageClass }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.arr.config.size }}

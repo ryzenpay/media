@@ -115,6 +115,20 @@ spec:
         - name: {{ .Values.arr.persistent.name }}
           mountPath: /tv
           subPath: tv
+      - name: readarr
+        image: ghcr.io/pennydreadful/bookshelf:hardcover
+        ports:
+        - containerPort: 8787
+        volumeMounts:
+        - name: arr-data
+          mountPath: /books
+          subPath: books
+        - name: readarr-config
+          mountPath: /config
+        {{- if .Values.qbittorrent.persistent.enabled }}
+        - name: qbit-data
+          mountPath: /downloads
+        {{- end }}
       volumes:
       - name: {{ .Values.arr.persistent.name }}
         persistentVolumeClaim:
@@ -139,3 +153,6 @@ spec:
       - name: bazarr-config
         persistentVolumeClaim:
           claimName: bazarr-config
+      - name: readarr-config
+        persistentVolumeClaim:
+          claimName: readarr-config
