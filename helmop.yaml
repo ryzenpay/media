@@ -7,7 +7,7 @@ spec:
   helm:
     pollingInterval: 1m
     repo: oci://harbor.ryzen.me/library/arr-stack
-    version: 0.2.0
+    version: 0.3.0
     values:
       ingress:
         domain: media.ryzen.me

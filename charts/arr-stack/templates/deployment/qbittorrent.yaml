@@ -15,6 +15,16 @@ spec:
       labels:
         app: qbit
     spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - arr
+            topologyKey: "kubernetes.io/hostname"
       securityContext:
         fsGroup: {{ .Values.pgid }}
     {{ if .Values.qbittorrent.vpn.enabled }}

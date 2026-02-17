@@ -112,7 +112,7 @@ spec:
         - name: arr-data
           mountPath: /movies
           subPath: movies
-        - name: {{ .Values.arr.persistent.name }}
+        - name: arr-data
           mountPath: /tv
           subPath: tv
       - name: readarr
