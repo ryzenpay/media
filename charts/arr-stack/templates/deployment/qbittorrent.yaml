@@ -125,7 +125,7 @@ spec:
         persistentVolumeClaim:
           claimName: qbit-config
       {{- if .Values.qbittorrent.persistent.enabled }}
-      - name: {{ .Values.qbittorrent.persistent.name }}
+      - name: qbit-data
         persistentVolumeClaim:
           claimName: qbit-data
       {{- end }}

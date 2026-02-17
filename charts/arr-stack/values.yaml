@@ -17,7 +17,6 @@ qbittorrent:
     enabled: true
     size: 100Gi
     storageClass: ""
-    name: qbit-data
   vpn:
     enabled: true
     healthcheck: true
@@ -62,7 +61,6 @@ arr:
   persistent:
     size: 100Gi
     storageClass: ""
-    name: arr-data
   config:
     storageClass: ""
     size: 1Gi
