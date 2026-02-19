@@ -32,7 +32,6 @@ qbittorrent:
       privateKey: ""
       addressesSecretKey: WIREGUARD_ADDRESSES
       addresses: ""
-  livenessProbe: false #EXPERMIMENTAL
   extraEnv: {}
   lifecycle:
     postStart:
